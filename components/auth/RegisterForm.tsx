@@ -14,27 +14,28 @@ import {
 } from '../ui/form'
 
 import { CardWrapper } from './CardWrapper'
-import { LoginSchema } from '@/schema'
+import { RegisterSchema } from '@/schema'
 import { Button } from '../ui/button'
 import { FormError } from '../FormError'
 import { FormSuccess } from '../FormSuccess'
 import { login } from '@/actions/login'
 import { useState, useTransition } from 'react'
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const [error, setError] = useState<string | undefined>('')
   const [success, setSuccess] = useState<string | undefined>('')
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof RegisterSchema>>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
       email: '',
       password: '',
+      name: '',
     },
   })
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     startTransition(() => {
       login(values).then((data) => {
         setError(data.error)
@@ -45,9 +46,9 @@ export default function LoginForm() {
 
   return (
     <CardWrapper
-      headerLabel="Welcome back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
+      headerLabel="Create an account"
+      backButtonLabel="Already have an account?"
+      backButtonHref="/auth/login"
       showSocial
     >
       <Form {...form}>
@@ -73,6 +74,23 @@ export default function LoginForm() {
             />
             <FormField
               control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isPending}
+                      placeholder="Harry Potter"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
@@ -88,7 +106,7 @@ export default function LoginForm() {
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button className="w-full" disabled={isPending} type="submit">
-            Login
+            Register
           </Button>
         </form>
       </Form>
